@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="MainActivity">
+    <TextView
+        android:background="@android:color/background_dark"
+        android:text="TextView"
+        android:padding="3dp"
+        android:textColor="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:text="氧钒配合物1，2及3与ct-dna作用后均引起电子收光谱的变化，而且发生不同程度的红移和减色效应。红移及减色率的大小顺序均为：3>1>2。为了进一步了解这三种钒配合物与ct-dna作用的强弱，计算了它们与ct-dna作用的结合常数kb。表明三种氧钒配合物与ct-dna的结合作用强度为3>1>2。实验结果表明三种氧钒配合物均以插入方式与ct-dna结合，并且配合物3与dna的结合作用要强于1和2。"
+        android:layout_weight="1"
+        android:layout_height="0dp"/>
+    <TextView
+        android:background="@android:color/background_dark"
+        android:text="JustifyTextView"
+        android:padding="3dp"
+        android:textColor="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <io.github.leibnik.justifytextview.JustifyTextView
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:text="氧钒配合物1，2及3与ct-dna作用后均引起电子收光谱的变化，而且发生不同程度的红移和减色效应。红移及减色率的大小顺序均为：3>1>2。为了进一步了解这三种钒配合物与ct-dna作用的强弱，计算了它们与ct-dna作用的结合常数kb。表明三种氧钒配合物与ct-dna的结合作用强度为3>1>2。实验结果表明三种氧钒配合物均以插入方式与ct-dna结合，并且配合物3与dna的结合作用要强于1和2。"/>
+</LinearLayout>
