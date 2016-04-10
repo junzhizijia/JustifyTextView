@@ -2,20 +2,6 @@
 TextView在换行时常常会出现参差不齐的情况，JustifyTextView就是为了解决这样的问题而来的。当然，这个自定义View主要用于学习研究，
 请谨慎用于实际项目。
 
-##中英文混排效果
-
-####全角半角完全对齐
-![](http://ww1.sinaimg.cn/mw690/b5405c76gw1f2s6s8dxjnj20dc0m8djf.jpg)
-
-####仅全角对齐
-![](http://ww3.sinaimg.cn/mw690/b5405c76gw1f2s7dtgd6xj20dc0m8q6l.jpg)
-
-##英文效果
-![](http://ww2.sinaimg.cn/mw690/b5405c76gw1f2s6r3dgocj20dc0m8jut.jpg)
-
-##中文效果
-![](http://ww2.sinaimg.cn/mw690/b5405c76gw1f2s8cpvoupj20dc0m8ac9.jpg)
-
 ##使用
 
 ####gradle
@@ -41,6 +27,18 @@ dependencies {
 `app:character_space`：配置字符间距
 
 `app:align_chars`：是否完全对齐字符，默认完全对齐，仅在文本包含CJK字符时有效
+
+##中英文混排效果
+
+####左：全角半角完全对齐   右：仅全角对齐
+![](http://ww2.sinaimg.cn/mw690/b5405c76gw1f2sa25f96rj20qn0l5tfv.jpg)
+
+##英文效果
+![](http://ww4.sinaimg.cn/mw690/b5405c76gw1f2sa24plh0j20dc0l6wi3.jpg)
+
+##中文效果
+![](http://ww2.sinaimg.cn/mw690/b5405c76gw1f2sa24iog3j20dc0l6ac3.jpg)
+
 
 # License
 
