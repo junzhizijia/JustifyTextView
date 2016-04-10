@@ -28,11 +28,12 @@ dependencies {
 
 `app:align_chars`：是否完全对齐字符，默认完全对齐，仅在文本包含CJK字符时有效
 
-##中英文混排效果
+##全角半角混排效果
 
-####左：全角半角完全对齐   右：仅全角对齐
-![](http://ww2.sinaimg.cn/mw690/b5405c76gw1f2sa25f96rj20qn0l5tfv.jpg)
-
+####全角半角完全对齐
+![](http://ww3.sinaimg.cn/mw690/b5405c76gw1f2sa7nkghhj20de0l50w5.jpg)
+####仅全角对齐
+![](http://ww4.sinaimg.cn/mw690/b5405c76gw1f2sa7n2s6yj20dc0l60w8.jpg)
 ##英文效果
 ![](http://ww4.sinaimg.cn/mw690/b5405c76gw1f2sa24plh0j20dc0l6wi3.jpg)
 
