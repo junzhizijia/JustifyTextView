@@ -17,16 +17,23 @@ import android.widget.TextView;
 public class JustifyTextView extends TextView {
 
     private TextPaint mPaint;
-    private String mText;
     private Layout mLayout;
+    // 行高
     private int mTextHeight;
+    // 纵坐标
     private float mLineY;
+    // view的内容宽度
     private int mContentWidth;
+    // 字符间距
+    private float mCharacterSpace;
+    // 字符间距的一半
     private float mGapWidth;
-    private int mLineLength;
-    private float mBlankSpace;
-    private float mGapWidthProportion;
+    // 行间距
     private int mLineSpace;
+    // 全角字符宽度
+    private float mSBCwith;
+    // 是否对齐
+    private boolean isToAlignChars;
 
     public JustifyTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -35,10 +42,17 @@ public class JustifyTextView extends TextView {
 
     private void init(Context context, AttributeSet attrs) {
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.JustifyTextView);
-        mGapWidthProportion = ta.getFraction(ta.getIndex(R.styleable.JustifyTextView_gapwidth_proportion_of_fontsize)
-                , 1, 1, 0.6f);
+        mCharacterSpace = ta.getDimensionPixelSize(ta.getIndex(R.styleable.JustifyTextView_character_space)
+                , 0);
         mLineSpace = ta.getDimensionPixelSize(ta.getIndex(R.styleable.JustifyTextView_line_space), 1);
+        isToAlignChars = ta.getBoolean(ta.getIndex(R.styleable.JustifyTextView_align_chars), true);
         ta.recycle();
+        mGapWidth = mCharacterSpace / 2;
+        String text = getText().toString();
+        if (text.charAt(text.length() - 1) == 10) {
+            text = text.substring(0, text.length() - 1);
+            setText(text);
+        }
     }
 
     @Override
@@ -47,9 +61,7 @@ public class JustifyTextView extends TextView {
         mPaint.setColor(getCurrentTextColor());
         mPaint.drawableState = getDrawableState();
 
-        mText = getText().toString();
-        setText(mText);
-
+        String text = getText().toString();
         mLayout = getLayout();
         // layout.getLayout()在4.4.3出现NullPointerException
         if (mLayout == null) {
@@ -64,83 +76,133 @@ public class JustifyTextView extends TextView {
         }
         mTextHeight = (int) (mTextHeight * mLayout.getSpacingMultiplier() + mLayout.getSpacingAdd());
 
-        int firstLineStart = mLayout.getLineStart(0);
-        int firstLineEnd = mLayout.getLineEnd(0);
-        String line = mText.substring(firstLineStart, firstLineEnd);
-
-        // 单个字符宽度
-        float charWidth = getCharWidth(line);
-        // 一行中分配的间隙总宽度
-        mBlankSpace = mGapWidthProportion * charWidth;
         // view内容的宽度
         mContentWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
-        // 装满一行的字符个数
-        mLineLength = (int) ((mContentWidth - mBlankSpace) / charWidth);
-        // 字符与字符间的间隙
-        mGapWidth = ((mContentWidth - charWidth * mLineLength) / (mLineLength - 1));
+        // 全角字符宽度
+        mSBCwith = getSBCwidth(text);
 
-        drawLines(canvas, mText, mTextHeight, mGapWidth);
-    }
-
-    private float getCharWidth(String line) {
-        for (int i = 0; i < line.length(); i++) {
-            String c = String.valueOf(line.charAt(i));
-            if (!isLetterOfEnglish(line.charAt(i)) && !isHalfPunctuation(line.charAt(i))) {
-                return StaticLayout.getDesiredWidth(c, getPaint());
+        if (mSBCwith > 0) {
+            if (isToAlignChars) {
+                drawAligmentLines(canvas, text);
+            } else {
+                drawSBCLines(canvas, text);
             }
+        } else {
+            drawDBCLines(canvas, text);
         }
-        return StaticLayout.getDesiredWidth(String.valueOf(line.charAt(0)), getPaint());
+        canvas.restore();
     }
 
-    private void drawLines(Canvas canvas, String text, int textHeight, float gapWidth) {
+    private void drawSBCLines(Canvas canvas, String text) {
 
         mLineY = getTextSize() + getPaddingTop();
         float x = getPaddingLeft();
         for (int i = 0; i < text.length(); i++) {
             String c = String.valueOf(text.charAt(i));
+            if (c.equals(" ")) {
+                continue;
+            }
             float cw = StaticLayout.getDesiredWidth(c, getPaint());
             canvas.drawText(c, x, mLineY, getPaint());
-            x += cw + gapWidth;
-            if (x + cw - gapWidth > mContentWidth + getPaddingLeft()) {
-                mLineY += textHeight;
+            x += cw + mCharacterSpace;
+            if (x + cw - mCharacterSpace > mContentWidth + getPaddingLeft() || c.equals("\n")) {
+                mLineY += mTextHeight;
                 x = getPaddingLeft();
-            } else if (x + cw > mContentWidth + getPaddingLeft()
-                    && x - gapWidth + cw <= mContentWidth + getPaddingLeft()) {
-                x -= gapWidth;
+            }
+            // 一行中的最后一个字符能挤就挤，(●'◡'●)
+            else if (x + cw > mContentWidth + getPaddingLeft()
+                    && x - mCharacterSpace + cw <= mContentWidth + getPaddingLeft()) {
+                x -= mCharacterSpace;
             }
         }
     }
 
-    public static boolean isLetterOfEnglish(char c) {
-        int count = (int) c;
-        if (count >= 65 && count <= 90) {
-            // A ~ Z
-            return true;
-        } else if (count >= 97 && count <= 122) {
-            // a ~ z
-            return true;
-        } else if (count >= 48 && count <= 57) {
-            // 0 ~ 9
-            return true;
+    private void drawAligmentLines(Canvas canvas, String text) {
+
+        mLineY = getTextSize() + getPaddingTop();
+        float x = getPaddingLeft();
+        for (int i = 0; i < text.length(); i++) {
+            String c = String.valueOf(text.charAt(i));
+            if (c.equals(" ")) {
+                continue;
+            }
+            float cw = StaticLayout.getDesiredWidth(c, getPaint());
+            float currentGapWidth = getGapWidth(text.charAt(i));
+            canvas.drawText(c, x + currentGapWidth, mLineY, getPaint());
+            if (i < text.length() - 1) {
+                x += cw + 2 * currentGapWidth;
+                float nextCw = StaticLayout.getDesiredWidth(String.valueOf(text.charAt(i + 1)), getPaint());
+                float nextGapWidth = getGapWidth(text.charAt(i + 1));
+                if (x + nextCw + 2 * nextGapWidth > mContentWidth + getPaddingLeft() || c.equals("\n")) {
+                    mLineY += mTextHeight;
+                    x = getPaddingLeft();
+                }
+            }
         }
-        return false;
     }
 
-    public static boolean isHalfPunctuation(char c) {
-        int count = (int) c;
-        if (count >= 33 && count <= 47) {
-            // !~/
-            return true;
-        } else if (count >= 58 && count <= 64) {
-            // :~@
-            return true;
-        } else if (count >= 91 && count <= 96) {
-            // [~
-            return true;
-        } else if (count >= 123 && count <= 126) {
-            // {~~
-            return true;
+    private void drawDBCLines(Canvas canvas, String text) {
+        mLineY = getTextSize() + getPaddingTop();
+        float x = getPaddingLeft();
+
+        int lineCount = mLayout.getLineCount();
+        if (lineCount > 1) {
+            for (int i = 0; i < lineCount; i++) {
+                int lineStart = mLayout.getLineStart(i);
+                int lineEnd = mLayout.getLineEnd(i);
+                float lineWidth = mLayout.getLineWidth(i);
+                String line = text.substring(lineStart, lineEnd);
+                float wordSpace = (mContentWidth - lineWidth) / (getBlankCount(line) - 1);
+                for (int j = 0; j < line.length(); j++) {
+                    String c = String.valueOf(line.charAt(j));
+                    float cw = StaticLayout.getDesiredWidth(c, getPaint());
+                    canvas.drawText(c, x, mLineY, getPaint());
+                    if (i < lineCount - 1 && line.charAt(j) == 32) {
+                        x += cw + wordSpace;
+                    } else {
+                        x += cw;
+                    }
+                }
+                mLineY += mTextHeight;
+                x = getPaddingLeft();
+            }
+        } else {
+            int lineStart = mLayout.getLineStart(0);
+            int lineEnd = mLayout.getLineEnd(0);
+            String line = text.substring(lineStart, lineEnd);
+            for (int j = 0; j < line.length(); j++) {
+                String c = String.valueOf(line.charAt(j));
+                float cw = StaticLayout.getDesiredWidth(c, getPaint());
+                canvas.drawText(c, x, mLineY, getPaint());
+                x += cw;
+            }
         }
-        return false;
     }
+
+    private int getBlankCount(String line) {
+        int count = 0;
+        for (char c : line.toCharArray()) {
+            if (c == 32) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private float getSBCwidth(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            String c = String.valueOf(text.charAt(i));
+            if (Character.UnicodeBlock.of(text.charAt(i)) == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS) {
+                return StaticLayout.getDesiredWidth(c, getPaint());
+            }
+        }
+        return -1;
+    }
+
+    private float getGapWidth(char c) {
+        float gapWidth = (mSBCwith - StaticLayout.getDesiredWidth(String.valueOf(c)
+                , getPaint())) / 2 + mGapWidth;
+        return gapWidth;
+    }
+
 }
