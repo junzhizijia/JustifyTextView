@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="JustifyTextView">
-        <attr name="gapwidth_proportion_of_fontsize" format="fraction"> </attr>
+        <attr name="character_space" format="dimension"> </attr>
         <attr name="line_space" format="dimension"></attr>
+        <attr name="align_chars" format="boolean"></attr>
     </declare-styleable>
 </resources>
