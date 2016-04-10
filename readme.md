@@ -38,7 +38,7 @@ dependencies {
 
 `app:line_space`：配置行间距
 `app:character_space`：配置字符间距
-`app:align_chars`：是否完全对齐字符，默认完全对齐，仅在文本包含全角字符时有效
+`app:align_chars`：是否完全对齐字符，默认完全对齐，仅在文本包含CJK字符时有效
 
 # License
 
