@@ -1,6 +1,6 @@
 #JustifyTextView
 TextView在换行时常常会出现参差不齐的情况，JustifyTextView就是为了解决这样的问题而来的。当然，这个自定义View主要用于学习研究，
-请谨慎用于实际项目。\u0001
+请谨慎用于实际项目。
 
 ##中英文混排效果
 
@@ -37,7 +37,9 @@ dependencies {
 ```
 
 `app:line_space`：配置行间距
+
 `app:character_space`：配置字符间距
+
 `app:align_chars`：是否完全对齐字符，默认完全对齐，仅在文本包含CJK字符时有效
 
 # License
